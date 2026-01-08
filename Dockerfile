@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["FCG-Functions/FCG-Functions.csproj", "FCG-Functions/"]
+COPY ["FCG-Functions.csproj", "FCG-Functions/"]
 RUN dotnet restore "FCG-Functions/FCG-Functions.csproj"
 
-COPY . .
+COPY . FCG-Functions/
 WORKDIR /src/FCG-Functions
 RUN dotnet publish "FCG-Functions.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
