@@ -21,4 +21,9 @@
     <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="TestSender\**" />
+    <Content Remove="TestSender\**" />
+  </ItemGroup>
+
 </Project>

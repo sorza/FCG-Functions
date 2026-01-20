@@ -1,0 +1,27 @@
+File: .funcignore
+````````
+*.js.map
+*.ts
+.git*
+.vscode
+local.settings.json
+test
+.env
+.editorconfig
+obj
+bin
+func --version
+node_modules
+
+````````
+
+This is the code block that represents the suggested code change:
+
+````````
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
+````````
+
+
+# Response
+````````
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
