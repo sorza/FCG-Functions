@@ -7,6 +7,9 @@ var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices(services =>
     {
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.ConfigureFunctionsApplicationInsights();
+        
         var sendGridApiKey = Environment.GetEnvironmentVariable("SendGridApiKey") 
             ?? throw new InvalidOperationException("SendGridApiKey environment variable is not configured.");
         
