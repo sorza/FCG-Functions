@@ -51,4 +51,4 @@ jobs:
       run: |
         kubectl apply -f k8s/secretproviderclass-email-function.yaml
         kubectl apply -f k8s/
-        kubectl rollout status deployment/email-function -n shared --timeout=300s
+        kubectl rollout status deployment/email-function -n fcg-functions --timeout=300s
