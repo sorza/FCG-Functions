@@ -20,7 +20,7 @@ namespace FCG_Functions.Functions.Email
             
             var subject = $"Bem-vindo ao FCG-Games, {user.Name}!";
             var plainTextContent = $"Olá {user.Name}, obrigado por se cadastrar!";
-            var htmlContent = $"<strong>Olá {user.Name}, obrigado por se cadastrar!</strong>";
+            var htmlContent = $"Olá <strong>{user.Name}</strong>, obrigado por se cadastrar!";
            
             var from = new EmailAddress("alexandre.zordan@outlook.com", "FCG Games");
             var to = new EmailAddress(user!.Email);

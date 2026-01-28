@@ -49,6 +49,6 @@ jobs:
     
     - name: Deploy to AKS
       run: |
-        kubectl apply -f ../k8s/shared/secretproviderclass-email-function.yaml
-        kubectl apply -f ../k8s/shared/email-function/
+        kubectl apply -f k8s/secretproviderclass-email-function.yaml
+        kubectl apply -f k8s/
         kubectl rollout status deployment/email-function -n shared --timeout=300s

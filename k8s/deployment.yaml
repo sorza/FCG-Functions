@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-function
+  namespace: shared
+  labels:
+    app: email-function
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: email-function
+  template:
+    metadata:
+      labels:
+        app: email-function
+        version: v1
+    spec:
+      containers:
+      - name: email-function
+        image: alexandresorza/fcg-functions:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: AzureFunctionsJobHost__functions__0
+          value: "SendWelcomeEmailFunction"
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: fcg-secrets
+              key: appinsights-connection-string
+        - name: ServiceBusConnection
+          valueFrom:
+            secretKeyRef:
+              name: fcg-secrets
+              key: servicebus-connection
+        - name: SendGridApiKey
+          valueFrom:
+            secretKeyRef:
+              name: fcg-secrets
+              key: sendgrid-api-key
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "fcg-keyvault-secrets"
