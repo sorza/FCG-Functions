@@ -8,11 +8,10 @@ WORKDIR /src
 
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
 
-COPY ["FCG-Functions.csproj", "FCG-Functions/"]
-RUN dotnet restore "FCG-Functions/FCG-Functions.csproj"
+COPY ["FCG-Functions.csproj", "./"]
+RUN dotnet restore "FCG-Functions.csproj"
 
-COPY . FCG-Functions/
-WORKDIR /src/FCG-Functions
+COPY . .
 RUN dotnet publish "FCG-Functions.csproj" \
     -c Release \
     -o /app/publish \
