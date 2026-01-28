@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: email-function
-  namespace: shared
+  namespace: fcg-functions
   labels:
     app: email-function
     version: v1
