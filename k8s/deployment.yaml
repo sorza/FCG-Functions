@@ -18,37 +18,61 @@ spec:
         version: v1
     spec:
       containers:
-      - name: email-function
-        image: alexandresorza/fcg-functions:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        env:
-        - name: AzureFunctionsJobHost__functions__0
-          value: "SendWelcomeEmailFunction"
-        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: fcg-secrets
-              key: appinsights-connection-string
-        - name: ServiceBusConnection
-          valueFrom:
-            secretKeyRef:
-              name: fcg-secrets
-              key: servicebus-connection
-        - name: SendGridApiKey
-          valueFrom:
-            secretKeyRef:
-              name: fcg-secrets
-              key: sendgrid-api-key
-        - name: ASPNETCORE_URLS
-          value: "http://+:8080"
-        volumeMounts:
-        - name: secrets-store
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
+        - name: email-function
+          image: alexandresorza/fcg-functions:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          env:
+          - name: AzureFunctionsJobHost__functions__0
+            value: "SendWelcomeEmailFunction"
+          - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+            valueFrom:
+              secretKeyRef:
+                name: fcg-secrets
+                key: appinsights-connection-string
+          - name: ServiceBusConnection
+            valueFrom:
+              secretKeyRef:
+                name: fcg-secrets
+                key: servicebus-connection
+          - name: SendGridApiKey
+            valueFrom:
+              secretKeyRef:
+                name: fcg-secrets
+                key: sendgrid-api-key
+          - name: ASPNETCORE_URLS
+            value: "http://+:8080"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          volumeMounts:
+          - name: secrets-store
+            mountPath: "/mnt/secrets-store"
+            readOnly: true
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
       volumes:
       - name: secrets-store
         csi:
