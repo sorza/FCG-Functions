@@ -1,89 +1,44 @@
-# ⚡ FCG-Functions - Serverless Event Processors
+# ⚡ FCG-Functions
 
-> **Azure Functions** - Processamento serverless e event-driven para o ecossistema FCG Games
+Azure Functions — Processamento serverless event-driven para FCG Games.
 
 [![Azure Functions](https://img.shields.io/badge/Azure-Functions-0078D4?logo=microsoft-azure)](https://azure.microsoft.com/services/functions/)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Serverless](https://img.shields.io/badge/Architecture-Serverless-yellow)](https://aws.amazon.com/serverless/)
-[![Event-Driven](https://img.shields.io/badge/Pattern-Event--Driven-orange)](https://docs.microsoft.com/azure/architecture/guide/architecture-styles/event-driven)
+[![Serverless](https://img.shields.io/badge/Architecture-Serverless-yellow)](https://azure.microsoft.com/)
+[![Event-Driven](https://img.shields.io/badge/Pattern-Event--Driven-orange)](https://docs.microsoft.com/azure/architecture/)
 
-## 🎯 O que é este projeto?
+## 📝 Descrição
 
-**FCG-Functions** é a camada **serverless** da arquitetura FCG Games, implementando **Azure Functions** para processar eventos assíncronos e executar tarefas computacionalmente isoladas. Este projeto demonstra **arquitetura event-driven**, **desacoplamento** e **escalabilidade automática** sem gerenciamento de infraestrutura.
+**FCG-Functions** executa tarefas assíncronas serverless:
 
-### Por que Serverless?
-- ✅ **Custo Zero em Idle**: Pague apenas pelos milissegundos executados
-- ✅ **Auto-Scaling**: Escala automaticamente de 0 a milhares de instâncias
-- ✅ **Foco no Código**: Zero manutenção de servidores/containers
-- ✅ **Desacoplamento Total**: Consumidores independentes dos produtores de eventos
-
----
-
-## 🚀 Tecnologias e Padrões Aplicados
-
-### Stack Técnico
-| Tecnologia | Propósito | Conceito Aplicado |
-|------------|-----------|-------------------|
-| **Azure Functions v4** | Runtime Serverless | FaaS (Function as a Service) |
-| **.NET 8 Isolated Worker** | Runtime do .NET | Processo isolado, melhor performance |
-| **Azure Service Bus Trigger** | Event Consumption | Message-Driven Architecture |
-| **SendGrid API** | Email Transacional | Third-party Integration |
-| **Azure Storage** | State Management | Serverless State Persistence |
-
-### Padrões Arquiteturais Implementados
-
-#### ☁️ **Serverless Architecture**
-- **Function per Feature**: Uma função = Uma responsabilidade
-- **Stateless Execution**: Funções sem estado, dados via triggers
-- **Event-Driven**: 100% reativo a eventos de Service Bus
-
-#### 📬 **Asynchronous Messaging**
-- **Service Bus Triggers**: Consumo automático de tópicos
-- **Dead Letter Queue**: Mensagens problemáticas isoladas automaticamente
-- **At-Least-Once Delivery**: Garantia de processamento com idempotência
-
-#### 🔌 **Integration Patterns**
-- **Anti-Corruption Layer**: Funções isolam lógica de email de domínio de negócio
-- **Saga Pattern (Futuro)**: Orquestração de transações distribuídas
+- ✅ **WelcomeEmailFunction**: Envia email de boas-vindas (trigger: UserCreatedEvent)
+- ✅ **PaymentNotificationFunction**: Notifica sobre status de pagamento (trigger: PaymentProcessedEvent)
+- ✅ **Auto-scaling**: Escala de 0 a milhares de instâncias automaticamente
+- ✅ **Sem overhead**: Pague apenas pelos milissegundos executados
 
 ---
 
-## 📋 Funções Implementadas
+## 🚀 Pré-requisitos
 
-### 📧 **WelcomeEmailFunction**
-**Trigger**: `users-topic` (UserCreatedEvent)  
-**Ação**: Envia email de boas-vindas via SendGrid  
-**Idempotência**: Verifica se email já foi enviado antes de processar
+- Azure Functions Core Tools v4
+- .NET 8 SDK
+- Azure CLI
+- Conta Azure com Service Bus e SendGrid ativados
 
-```csharp
-[Function("WelcomeEmailFunction")]
-public async Task Run(
-    [ServiceBusTrigger("users-topic", "email-subscription")] 
-    UserCreatedEvent @event)
-{
-    await _emailService.SendWelcomeEmailAsync(@event.Email);
-}
+---
+
+## 🏗️ Estrutura
+
+```
+Functions/
+├── Email/
+│   ├── WelcomeEmailFunction.cs      → Trigger: UserCreatedEvent
+│   └── PaymentNotificationFunction.cs → Trigger: PaymentProcessedEvent
 ```
 
-### 💳 **PaymentNotificationFunction** *(Planejada)*
-**Trigger**: `payments-topic` (PaymentProcessedEvent)  
-**Ação**: Notifica usuário sobre status do pagamento  
-**Retry Policy**: Exponential backoff em caso de falha
-
 ---
 
-## ⚙️ Configuração e Deploy
-
-### Pré-requisitos
-```powershell
-# Instalar Azure Functions Core Tools
-npm install -g azure-functions-core-tools@4
-
-# Instalar Azure CLI
-winget install Microsoft.AzureCLI
-```
-
-### Configuração Local
+## ⚙️ Configuração Local
 
 **local.settings.json**:
 ```json
@@ -92,149 +47,115 @@ winget install Microsoft.AzureCLI
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "ServiceBusConnection": "<connection-string-do-service-bus>",
-    "SendGridApiKey": "<sua-api-key-sendgrid>"
+    "ServiceBusConnection": "<connection-string>",
+    "SendGridApiKey": "<api-key>"
   }
 }
 ```
 
-### Executar Localmente
-```powershell
+---
+
+## 🚀 Como Executar
+
+### Local
+```bash
 cd FCG-Functions
 func start
 ```
 
 ### Deploy no Azure
-```powershell
-# Login no Azure
+```bash
 az login
-
-# Deploy da Function App
 func azure functionapp publish fcg-functions
-
-# Verificar logs
 func azure functionapp logstream fcg-functions
 ```
 
-### Variáveis de Ambiente (Azure Portal)
-
-| Variável | Descrição | Onde Obter |
-|----------|-----------|------------|
-| `AzureWebJobsStorage` | Storage Account para estado da função | Azure Storage Connection String |
-| `ServiceBusConnection` | Connection string do Service Bus | Azure Service Bus → Shared Access Policies |
-| `SendGridApiKey` | Chave da API SendGrid | SendGrid Dashboard → API Keys |
-
 ---
 
-## 🏛️ Arquitetura - Diagrama Mermaid
+## 🧪 Testes
 
-```mermaid
-graph LR
-    subgraph "Event Sources"
-        UsersAPI[Users API]
-        PaymentsAPI[Payments API]
-    end
-    
-    subgraph "Azure Service Bus"
-        UsersTopic[users-topic]
-        PaymentsTopic[payments-topic]
-    end
-    
-    subgraph "Azure Functions (Serverless)"
-        WelcomeFunc[WelcomeEmailFunction]
-        PaymentFunc[PaymentNotificationFunction]
-    end
-    
-    subgraph "External Services"
-        SendGrid[SendGrid Email Service]
-    end
-    
-    UsersAPI -->|Publish Event| UsersTopic
-    PaymentsAPI -->|Publish Event| PaymentsTopic
-    
-    UsersTopic -->|Service Bus Trigger| WelcomeFunc
-    PaymentsTopic -->|Service Bus Trigger| PaymentFunc
-    
-    WelcomeFunc -->|Send Email| SendGrid
-    PaymentFunc -->|Send Email| SendGrid
-    
-    style WelcomeFunc fill:#4CAF50
-    style PaymentFunc fill:#2196F3
-    style SendGrid fill:#FF5722
-```
+```bash
+# Publicar evento no Service Bus
+az servicebus topic message send \
+  --resource-group fcg-microsservices \
+  --namespace-name fcg-azure-servicebus \
+  --topic-name users-topic \
+  --body '{
+    "userId":"123",
+    "email":"test@example.com",
+    "createdAt":"2026-01-09T00:00:00Z"
+  }'
 
----
-
-## 🧪 Testando as Funções
-
-### Testar WelcomeEmailFunction Localmente
-
-1. **Publique um evento manualmente no Service Bus**:
-```powershell
-# Usando Azure CLI
-az servicebus topic message send `
-  --resource-group fcg-microsservices `
-  --namespace-name fcg-azure-servicebus `
-  --topic-name users-topic `
-  --body '{"userId":"123","email":"teste@example.com","createdAt":"2026-01-09T00:00:00Z"}'
-```
-
-2. **Monitore os logs da função**:
-```powershell
+# Monitorar logs
 func start --verbose
 ```
 
-3. **Verifique o email recebido** no inbox do destinatário.
+---
+
+## 🐳 Docker
+
+```dockerfile
+FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated8.0
+
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+
+COPY publish /home/site/wwwroot
+```
 
 ---
 
-## 📊 Observabilidade e Monitoramento
+## ☸️ Kubernetes
 
-### Application Insights (Recomendado)
-```json
-// Adicionar ao local.settings.json
-{
-  "APPLICATIONINSIGHTS_CONNECTION_STRING": "<connection-string>"
-}
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fcg-functions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fcg-functions
+  template:
+    metadata:
+      labels:
+        app: fcg-functions
+    spec:
+      containers:
+      - name: fcg-functions
+        image: fcg-functions:latest
+        env:
+        - name: ServiceBusConnection
+          valueFrom:
+            secretKeyRef:
+              name: servicebus-secret
+              key: connection-string
+        - name: SendGridApiKey
+          valueFrom:
+            secretKeyRef:
+              name: sendgrid-secret
+              key: api-key
 ```
 
-### Logs Estruturados
-```csharp
-_logger.LogInformation(
-    "Email enviado para {Email} | CorrelationId: {CorrelationId}",
-    @event.Email,
-    @event.CorrelationId
-);
-```
+---
 
-### Métricas Importantes
-- **Execution Count**: Número de execuções por função
-- **Execution Duration**: Tempo médio de processamento
+## 📊 Monitoramento
+
+- **Application Insights**: Métricas, logs estruturados
+- **Execution Count**: Número de execuções
+- **Execution Duration**: Tempo de processamento
 - **Failure Rate**: Taxa de falhas/retries
-- **Dead Letter Messages**: Mensagens que falharam definitivamente
+- **Dead Letter Messages**: Mensagens problemáticas
 
 ---
 
-## 🎓 Conceitos Avançados Aplicados
+## 📚 Referências
 
-### **Cold Start Mitigation**
-- Premium Plan para funções críticas (sempre quente)
-- Durable Functions para workflows longos
-
-### **Idempotency**
-- Verificação de duplicatas antes de processar
-- Uso de MessageId como deduplication key
-
-### **Retry Policies**
-- Exponential Backoff configurado
-- Maximum Delivery Count = 10
-- Dead Letter Queue automático
-
----
-
-## 📚 Referências Técnicas
-
-- [Azure Functions Documentation](https://docs.microsoft.com/azure/azure-functions/)
+- [Azure Functions Docs](https://docs.microsoft.com/azure/azure-functions/)
 - [Service Bus Triggers](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger)
-- [Serverless Architectures (AWS Whitepaper)](https://d1.awsstatic.com/whitepapers/serverless-architectures-with-aws-lambda.pdf)
 - [SendGrid .NET SDK](https://github.com/sendgrid/sendgrid-csharp)
+
+---
+
+**FIAP Tech Challenge — Fase 4**
